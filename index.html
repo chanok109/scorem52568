@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ระบบแสดงคะแนนรายวิชา</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Sarabun:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+
+    <!-- Icons -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero__badge">
+        <i class="fa-solid fa-chart-column"></i>
+        <span>Score Dashboard</span>
+      </div>
+
+      <h1 class="hero__title">คะแนนรายวิชา ว32281 ปัญญาประดิษฐ์เบื้องต้น</h1>
+      <div class="hero__subtitle">
+        <div>ชั้นมัธยมศึกษาปีที่ 5</div>
+        <div>ภาคเรียนที่ 2 ปีการศึกษา 2568</div>
+        <div class="hero__school">
+          โรงเรียนวิทยาศาสตร์จุฬาภรณราชวิทยาลัย เชียงราย
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar__left">
+          <div class="pill">
+            <i class="fa-solid fa-filter"></i>
+            <span>เลือกห้อง</span>
+          </div>
+          <div id="classButtons" class="class-buttons"></div>
+        </div>
+
+        <div class="toolbar__right">
+          <button id="refreshBtn" class="btn btn--ghost" type="button">
+            <i class="fa-solid fa-rotate"></i>
+            รีเฟรชข้อมูล
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="grid">
+        <!-- Summary cards -->
+        <div class="card card--span2 card--summary">
+          <div class="card__head">
+            <h2>
+              <i class="fa-solid fa-gauge-high"></i> ภาพรวมคะแนนห้อง
+              <span id="roomTitle" class="muted"></span>
+            </h2>
+            <div class="hint">
+              <i class="fa-regular fa-circle-question"></i> เกรด: 4 (80–100),
+              3.5 (75–79), 3 (70–74), ปรับปรุง (&lt;70)
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="stat__icon"><i class="fa-solid fa-users"></i></div>
+              <div class="stat__meta">
+                <div class="stat__label">จำนวนนักเรียน</div>
+                <div class="stat__value" id="statCount">-</div>
+              </div>
+            </div>
+
+            <div class="stat">
+              <div class="stat__icon">
+                <i class="fa-solid fa-square-poll-vertical"></i>
+              </div>
+              <div class="stat__meta">
+                <div class="stat__label">คะแนนเฉลี่ย (เต็ม 100)</div>
+                <div class="stat__value" id="statAvg">-</div>
+              </div>
+            </div>
+
+            <div class="stat">
+              <div class="stat__icon"><i class="fa-solid fa-award"></i></div>
+              <div class="stat__meta">
+                <div class="stat__label">จำนวนนักเรียนที่ได้เกรด 4</div>
+                <div class="stat__value" id="statG4">-</div>
+              </div>
+            </div>
+
+            <div class="stat">
+              <div class="stat__icon"><i class="fa-solid fa-medal"></i></div>
+              <div class="stat__meta">
+                <div class="stat__label">จำนวนนักเรียนที่ได้เกรด 3–3.5</div>
+                <div class="stat__value" id="statG3to35">-</div>
+              </div>
+            </div>
+
+            <div class="stat">
+              <div class="stat__icon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+              </div>
+              <div class="stat__meta">
+                <div class="stat__label">จำนวนนักเรียนที่ได้เกรดต่ำกว่า 3</div>
+                <div class="stat__value" id="statBelow3">-</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Average bar chart -->
+        <div class="card card--avg">
+          <div class="card__head">
+            <h2>
+              <i class="fa-solid fa-chart-simple"></i> เปรียบเทียบคะแนนเฉลี่ย
+            </h2>
+            <div class="muted small">
+              งาน (60) • กลางภาค (20) • ปลายภาค (20) • รวม (100)
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="avgChart" aria-label="Average chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Grade distribution -->
+        <div class="card card--grade">
+          <div class="card__head">
+            <h2><i class="fa-solid fa-chart-pie"></i> การกระจายเกรด</h2>
+            <div class="muted small">
+              4: 80–100 • 3.5: 75–79 • 3: 70–74 • ปรับปรุง: &lt;70
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="gradeChart" aria-label="Grade distribution"></canvas>
+          </div>
+        </div>
+
+        <!-- Student stacked bars -->
+        <div class="card card--span2">
+          <div class="card__head">
+            <h2><i class="fa-solid fa-bars-staggered"></i> คะแนนรายบุคคล</h2>
+          </div>
+
+          <div class="legend">
+            <div class="legend__item">
+              <span class="swatch swatch--a"></span> งานที่มอบหมาย (60)
+            </div>
+            <div class="legend__item">
+              <span class="swatch swatch--m"></span> กลางภาค (20)
+            </div>
+            <div class="legend__item">
+              <span class="swatch swatch--f"></span> ปลายภาค (20)
+            </div>
+          </div>
+
+          <div id="studentList" class="student-list"></div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="footer__left">AI & Data Science KurNok| © 2026</div>
+        <div class="footer__right muted small" id="lastUpdated">-</div>
+      </footer>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
