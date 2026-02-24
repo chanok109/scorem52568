@@ -1,18 +1,13 @@
 :root {
   --bg: #f7fbff;
   --card: rgba(255, 255, 255, 0.78);
-  --stroke: rgba(30, 41, 59, 0.08);
+  --stroke: rgba(30, 41, 59, 0.1);
   --text: #0f172a;
   --muted: rgba(15, 23, 42, 0.65);
 
-  /* pastel theme */
-  --green: #bfe8d1;
-  --blue: #bfe3ff;
-  --pink: #ffd1e8;
-
-  --a: #bfe8d1; /* assignment */
-  --m: #bfe3ff; /* mid */
-  --f: #ffd1e8; /* final */
+  --a: #bfe8d1;
+  --m: #bfe3ff;
+  --f: #ffd1e8;
 
   --shadow: 0 12px 35px rgba(15, 23, 42, 0.1);
   --radius: 18px;
@@ -25,18 +20,10 @@ html,
 body {
   height: 100%;
 }
+
 body {
   margin: 0;
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    "Noto Sans Thai",
-    "Noto Sans",
-    "Sarabun",
-    Arial;
+  font-family: "Sarabun", sans-serif;
   color: var(--text);
   background:
     radial-gradient(
@@ -57,6 +44,7 @@ body {
     var(--bg);
 }
 
+/* ===== Header ===== */
 .hero {
   padding: 28px 18px 18px;
   max-width: 1100px;
@@ -64,25 +52,27 @@ body {
 }
 
 .hero__badge {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--stroke);
+  box-shadow: var(--shadow);
+  font-family: "Kanit", sans-serif;
+  font-weight: 600;
+}
+
+.hero__title {
+  margin: 14px 0 6px;
+  font-size: clamp(22px, 3vw, 34px);
   font-family: "Kanit", sans-serif;
   font-weight: 800;
   letter-spacing: 0.5px;
   background: linear-gradient(90deg, #5bc0a5, #6ab7ff, #ff86c8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  display: inline-flex;
-  gap: 10px;
-  align-items: center;
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--stroke);
-  box-shadow: var(--shadow);
-}
-
-.hero__title {
-  margin: 14px 0 6px;
-  font-size: clamp(22px, 3vw, 34px);
-  letter-spacing: 0.2px;
 }
 
 .hero__subtitle {
@@ -91,60 +81,24 @@ body {
 }
 
 .hero__school {
-  font-family: "Kanit", sans-serif;
-  font-weight: 500;
   margin-top: 6px;
   display: inline-block;
   padding: 8px 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.65);
   border: 1px solid var(--stroke);
+  font-family: "Kanit", sans-serif;
+  font-weight: 500;
 }
 
-.toolbar {
-  margin-top: 16px;
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.toolbar__left {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.toolbar__right {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.pill {
-  display: inline-flex;
-  gap: 10px;
-  align-items: center;
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid var(--stroke);
-}
-
-.class-buttons {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
+/* ===== Buttons ===== */
 .btn {
   cursor: pointer;
   border: 1px solid var(--stroke);
   background: rgba(255, 255, 255, 0.7);
   padding: 10px 12px;
   border-radius: 999px;
-  font-weight: 650;
+  font-weight: 700;
   color: var(--text);
   transition:
     transform 0.12s ease,
@@ -160,24 +114,11 @@ body {
   transform: translateY(-1px);
   box-shadow: var(--shadow);
 }
-.btn:active {
-  transform: translateY(0px);
-}
-
-.btn--active {
-  background: linear-gradient(
-    135deg,
-    rgba(191, 232, 209, 0.75),
-    rgba(191, 227, 255, 0.7),
-    rgba(255, 209, 232, 0.7)
-  );
-  border-color: rgba(15, 23, 42, 0.1);
-}
-
 .btn--ghost {
   background: rgba(255, 255, 255, 0.55);
 }
 
+/* ===== Layout ===== */
 .container {
   max-width: 1100px;
   margin: 0 auto;
@@ -189,13 +130,13 @@ body {
   grid-template-columns: 1.2fr 0.8fr;
   gap: 14px;
 }
-
 @media (max-width: 980px) {
   .grid {
     grid-template-columns: 1fr;
   }
 }
 
+/* ===== Cards ===== */
 .card {
   background: var(--card);
   border: 1px solid var(--stroke);
@@ -204,7 +145,6 @@ body {
   padding: 16px 16px 14px;
   backdrop-filter: blur(10px);
 }
-
 .card--span2 {
   grid-column: 1 / -1;
 }
@@ -212,11 +152,25 @@ body {
 .card__head h2 {
   margin: 0 0 6px;
   font-size: 18px;
+  font-family: "Kanit", sans-serif;
+  font-weight: 700;
 }
 .card__head h2 i {
   margin-right: 10px;
   opacity: 0.85;
 }
+
+.card__head h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-family: "Kanit", sans-serif;
+  font-weight: 700;
+}
+.card__head h3 i {
+  margin-right: 10px;
+  opacity: 0.85;
+}
+
 .hint {
   color: var(--muted);
   font-size: 13px;
@@ -228,16 +182,51 @@ body {
   font-size: 12.5px;
 }
 
+/* ===== Pastel background cards ===== */
+.card--summary {
+  background: linear-gradient(
+    135deg,
+    rgba(191, 232, 209, 0.65),
+    rgba(255, 255, 255, 0.55)
+  );
+  border: 1px solid rgba(16, 185, 129, 0.16);
+}
+.card--avg {
+  background: linear-gradient(
+    135deg,
+    rgba(191, 227, 255, 0.65),
+    rgba(255, 255, 255, 0.55)
+  );
+  border: 1px solid rgba(59, 130, 246, 0.16);
+}
+.card--grade {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 209, 232, 0.65),
+    rgba(255, 255, 255, 0.55)
+  );
+  border: 1px solid rgba(236, 72, 153, 0.16);
+}
+
+/* ===== Stats ===== */
 .stats {
   margin-top: 12px;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 10px;
 }
-
 @media (max-width: 980px) {
   .stats {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stats--m5 {
+  grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 980px) {
+  .stats--m5 {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -274,11 +263,106 @@ body {
   margin-top: 2px;
 }
 
+/* ===== Charts ===== */
 .chart-wrap {
   margin-top: 10px;
   height: 280px;
 }
+.chart--short {
+  height: 250px;
+}
 
+/* ===== M5 section ===== */
+.card--m5 {
+  margin-top: 16px;
+  margin-bottom: 10px;
+  background: linear-gradient(
+    135deg,
+    rgba(191, 232, 209, 0.6),
+    rgba(191, 227, 255, 0.6),
+    rgba(255, 209, 232, 0.6)
+  );
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(14px);
+}
+
+.m5-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 980px) {
+  .m5-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card--inner {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+}
+
+/* ===== Class selection highlight ===== */
+.class-section {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #1e293b, #334155);
+  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.class-section__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Kanit", sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: #ffffff;
+  margin-bottom: 14px;
+  letter-spacing: 0.3px;
+}
+.class-section__header i {
+  color: #38bdf8;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.class-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.class-section .btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+.class-section .btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+}
+.class-section .btn--active {
+  background: linear-gradient(135deg, #38bdf8, #22d3ee);
+  color: #0f172a;
+  border: none;
+  box-shadow: 0 8px 20px rgba(56, 189, 248, 0.35);
+}
+.class-section .btn--ghost {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+/* ===== Legend ===== */
 .legend {
   margin-top: 10px;
   display: flex;
@@ -287,7 +371,6 @@ body {
   color: var(--muted);
   font-size: 13px;
 }
-
 .legend__item {
   display: flex;
   align-items: center;
@@ -309,7 +392,7 @@ body {
   background: var(--f);
 }
 
-/* ===== Modern student list ===== */
+/* ===== Student list modern ===== */
 .student-list {
   margin-top: 14px;
   display: flex;
@@ -317,7 +400,6 @@ body {
   gap: 12px;
 }
 
-/* การ์ดรายคน */
 .row {
   display: grid;
   grid-template-columns: 260px 1fr 170px;
@@ -337,35 +419,29 @@ body {
     box-shadow 0.15s ease,
     border-color 0.15s ease;
 }
-
 .row:hover {
   transform: translateY(-2px);
   box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12);
   border-color: rgba(15, 23, 42, 0.12);
 }
-
 @media (max-width: 980px) {
   .row {
     grid-template-columns: 1fr;
   }
 }
 
-/* ฝั่งซ้าย */
 .left {
   display: flex;
   flex-direction: column;
   gap: 6px;
   min-width: 0;
 }
-
 .left .no {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   font-weight: 900;
-  letter-spacing: 0.2px;
 }
-
 .left .no::before {
   content: "";
   width: 10px;
@@ -379,7 +455,6 @@ body {
   );
   border: 1px solid rgba(15, 23, 42, 0.12);
 }
-
 .left .name {
   color: var(--muted);
   font-size: 13.5px;
@@ -388,7 +463,6 @@ body {
   text-overflow: ellipsis;
 }
 
-/* แถบคะแนน (หนาขึ้น + ดู modern) */
 .bar {
   height: 22px;
   border-radius: 999px;
@@ -399,56 +473,6 @@ body {
   position: relative;
 }
 
-.seg {
-  height: 100%;
-}
-.seg--a {
-  background: var(--a);
-}
-.seg--m {
-  background: var(--m);
-}
-.seg--f {
-  background: var(--f);
-}
-
-/* ฝั่งขวา */
-.right {
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-}
-
-.right .total {
-  font-weight: 950;
-  font-size: 18px;
-  letter-spacing: 0.2px;
-}
-.badge {
-  display: inline-flex;
-  justify-content: flex-end;
-  gap: 8px;
-  align-items: center;
-  color: var(--muted);
-  font-size: 13px;
-}
-.badge i {
-  opacity: 0.8;
-}
-
-.footer {
-  margin-top: 14px;
-  padding: 12px 2px 0;
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-/* ทำให้ segment มีพื้นที่วางตัวเลข */
-/* segment: แสดงตัวเลข */
 .seg {
   height: 100%;
   display: flex;
@@ -462,19 +486,14 @@ body {
   position: relative;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
 }
-
-/* เส้นแบ่งระหว่าง segment */
 .seg + .seg {
   box-shadow: inset 1px 0 0 rgba(15, 23, 42, 0.12);
 }
-
-/* ถ้าแคบเกิน ซ่อนเลข (ไม่รก) */
 .seg--tiny {
   color: transparent;
   padding: 0;
 }
 
-/* เพิ่มเอฟเฟกต์ sheen เบา ๆ ให้ดู premium */
 .seg::after {
   content: "";
   position: absolute;
@@ -488,7 +507,29 @@ body {
   opacity: 0.35;
   pointer-events: none;
 }
-/* ชิปเกรดแบบ modern */
+
+.seg--a {
+  background: var(--a);
+}
+.seg--m {
+  background: var(--m);
+}
+.seg--f {
+  background: var(--f);
+}
+
+.right {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.right .total {
+  font-weight: 950;
+  font-size: 18px;
+}
+
 .grade-chip {
   display: inline-flex;
   align-items: center;
@@ -501,12 +542,6 @@ body {
   font-size: 13px;
   font-weight: 800;
 }
-
-.grade-chip i {
-  opacity: 0.85;
-}
-
-/* สีชิปตามเกรด */
 .grade--4 {
   background: rgba(191, 232, 209, 0.65);
 }
@@ -520,45 +555,14 @@ body {
   background: rgba(255, 209, 232, 0.35);
   border-color: rgba(239, 68, 68, 0.18);
 }
-/* ===== Pastel Background Cards ===== */
 
-.card--summary {
-  background: linear-gradient(
-    135deg,
-    rgba(191, 232, 209, 0.65),
-    rgba(191, 232, 209, 0.35)
-  );
-  border: 1px solid rgba(16, 185, 129, 0.15);
-}
-
-.card--avg {
-  background: linear-gradient(
-    135deg,
-    rgba(191, 227, 255, 0.65),
-    rgba(191, 227, 255, 0.35)
-  );
-  border: 1px solid rgba(59, 130, 246, 0.15);
-}
-
-.card--grade {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 209, 232, 0.65),
-    rgba(255, 209, 232, 0.35)
-  );
-  border: 1px solid rgba(236, 72, 153, 0.15);
-}
-
-/* ทำให้หัวข้ออ่านชัดขึ้นบนพื้นสี */
-.card--summary h2,
-.card--avg h2,
-.card--grade h2 {
-  color: #0f172a;
-}
-
-/* เพิ่ม effect glass นุ่ม ๆ */
-.card--summary,
-.card--avg,
-.card--grade {
-  backdrop-filter: blur(12px);
+/* ===== Footer ===== */
+.footer {
+  margin-top: 14px;
+  padding: 12px 2px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
 }
