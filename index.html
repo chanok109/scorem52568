@@ -1,16 +1,28 @@
 <!doctype html>
-<html lang="en">
+<html lang="th">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>ระบบแสดงคะแนนรายวิชา</title>
+
+    <!-- ลดปัญหา cache (ช่วยได้ในหลายกรณี โดยเฉพาะตอนพัฒนา) -->
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Sarabun:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Sarabun:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css" />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css?v=6" />
 
     <!-- Icons -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
@@ -19,9 +31,51 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
 
-    <!-- Chart.js -->
+    <!-- Chart.js (only) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- ✅ Kill DataLabels ก่อนโหลด app.js (กัน % โผล่กลางแท่งจากไฟล์เก่า/แคช/สคริปต์อื่น) -->
+    <script>
+      (function () {
+        try {
+          // ถ้าเคยใช้ service worker (บางคนเคยทำ PWA) ให้ลบออกเพื่อลด cache ค้าง
+          if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.getRegistrations().then((regs) => {
+              regs.forEach((r) => r.unregister());
+            });
+          }
+        } catch (e) {}
+
+        // รอให้ Chart โหลดก่อนค่อย unregister
+        window.__killDataLabels = function () {
+          try {
+            if (!window.Chart) return;
+
+            // กรณี global ชื่อ ChartDataLabels
+            if (typeof ChartDataLabels !== "undefined") {
+              Chart.unregister(ChartDataLabels);
+            }
+            // กรณี global เป็น window.ChartDataLabels
+            if (window.ChartDataLabels) {
+              Chart.unregister(window.ChartDataLabels);
+            }
+            // กรณีถูก register ในนาม id "datalabels"
+            const items = Chart.registry?.plugins?.items || {};
+            Object.values(items).forEach((p) => {
+              if (p?.id === "datalabels") Chart.unregister(p);
+            });
+
+            // ปิดเป็นค่าเริ่มต้น
+            Chart.defaults.plugins.datalabels = { display: false };
+          } catch (e) {}
+        };
+
+        // เรียกทันที (เผื่อ Chart พร้อมแล้ว)
+        window.__killDataLabels();
+      })();
+    </script>
   </head>
+
   <body>
     <header class="hero">
       <div class="hero__badge">
@@ -29,7 +83,7 @@
         <span>Score Dashboard</span>
       </div>
 
-      <h1 class="hero__title">คะแนนรายวิชา ว32281 ปัญญาประดิษฐ์เบื้องต้น</h1>
+      <h1 class="hero__title">คะแนนรายวิชาปัญญาประดิษฐ์เบื้องต้น</h1>
       <div class="hero__subtitle">
         <div>ชั้นมัธยมศึกษาปีที่ 5</div>
         <div>ภาคเรียนที่ 2 ปีการศึกษา 2568</div>
@@ -38,27 +92,96 @@
         </div>
       </div>
 
-      <div class="toolbar">
-        <div class="toolbar__left">
-          <div class="pill">
-            <i class="fa-solid fa-filter"></i>
-            <span>เลือกห้อง</span>
-          </div>
-          <div id="classButtons" class="class-buttons"></div>
+      <!-- ===== ภาพรวมระดับชั้น ม.5 (ก่อนเลือกห้อง) ===== -->
+      <section class="card card--m5">
+        <div class="card__head">
+          <h2><i class="fa-solid fa-school"></i> ภาพรวมคะแนนระดับชั้น ม.5</h2>
+          <div class="muted small">สรุปข้อมูลทุกห้องรวมกัน</div>
         </div>
 
-        <div class="toolbar__right">
-          <button id="refreshBtn" class="btn btn--ghost" type="button">
-            <i class="fa-solid fa-rotate"></i>
-            รีเฟรชข้อมูล
-          </button>
+        <div class="stats stats--m5">
+          <div class="stat">
+            <div class="stat__icon"><i class="fa-solid fa-users"></i></div>
+            <div class="stat__meta">
+              <div class="stat__label">จำนวนนักเรียนทั้งหมด</div>
+              <div class="stat__value" id="m5Count">-</div>
+            </div>
+          </div>
+
+          <div class="stat">
+            <div class="stat__icon">
+              <i class="fa-solid fa-square-poll-vertical"></i>
+            </div>
+            <div class="stat__meta">
+              <div class="stat__label">คะแนนเฉลี่ยทั้งระดับ (เต็ม 100)</div>
+              <div class="stat__value" id="m5Avg">-</div>
+            </div>
+          </div>
+
+          <div class="stat">
+            <div class="stat__icon"><i class="fa-solid fa-award"></i></div>
+            <div class="stat__meta">
+              <div class="stat__label">เกรด 4 ทั้งหมด</div>
+              <div class="stat__value" id="m5G4">-</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="m5-grid">
+          <div class="card card--inner">
+            <div class="card__head">
+              <h3>
+                <i class="fa-solid fa-chart-column"></i>
+                เปรียบเทียบคะแนนเฉลี่ยของแต่ละห้อง
+              </h3>
+              <div class="muted small">
+                แสดงเฉพาะตัวเลขค่าเฉลี่ยบนแท่ง (ไม่มี %)
+              </div>
+            </div>
+            <div class="chart-wrap chart--short">
+              <canvas id="m5RoomAvgChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card card--inner">
+            <div class="card__head">
+              <h3>
+                <i class="fa-solid fa-chart-pie"></i> การกระจายเกรดของนักเรียน
+                ม.5
+              </h3>
+              <div class="muted small">แสดงเปอร์เซ็นต์บนชิ้นพาย</div>
+            </div>
+            <div class="chart-wrap chart--short">
+              <canvas id="m5GradeChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== เลือกห้อง (กรอบเข้ม เน้นสำคัญ) ===== -->
+      <div class="class-section">
+        <div class="class-section__header">
+          <i class="fa-solid fa-chalkboard-user"></i>
+          เลือกห้องเรียน
+        </div>
+
+        <div class="toolbar">
+          <div class="toolbar__left">
+            <div id="classButtons" class="class-buttons"></div>
+          </div>
+
+          <div class="toolbar__right">
+            <button id="refreshBtn" class="btn btn--ghost" type="button">
+              <i class="fa-solid fa-rotate"></i>
+              รีเฟรชข้อมูล
+            </button>
+          </div>
         </div>
       </div>
     </header>
 
     <main class="container">
       <section class="grid">
-        <!-- Summary cards -->
         <div class="card card--span2 card--summary">
           <div class="card__head">
             <h2>
@@ -66,8 +189,8 @@
               <span id="roomTitle" class="muted"></span>
             </h2>
             <div class="hint">
-              <i class="fa-regular fa-circle-question"></i> เกรด: 4 (80–100),
-              3.5 (75–79), 3 (70–74), ปรับปรุง (&lt;70)
+              <i class="fa-regular fa-circle-question"></i>
+              เกรด: 4 (80–100), 3.5 (75–79), 3 (70–74), ปรับปรุง (&lt;70)
             </div>
           </div>
 
@@ -118,38 +241,43 @@
           </div>
         </div>
 
-        <!-- Average bar chart -->
         <div class="card card--avg">
           <div class="card__head">
             <h2>
               <i class="fa-solid fa-chart-simple"></i> เปรียบเทียบคะแนนเฉลี่ย
+              (ห้องที่เลือก)
             </h2>
             <div class="muted small">
-              งาน (60) • กลางภาค (20) • ปลายภาค (20) • รวม (100)
+              งาน (60) • กลางภาค (20) • ปลายภาค (20) • รวม (100) — ตัวเลขล้วน
+              (ไม่มี %)
             </div>
           </div>
           <div class="chart-wrap">
-            <canvas id="avgChart" aria-label="Average chart"></canvas>
+            <canvas id="avgChart"></canvas>
           </div>
         </div>
 
-        <!-- Grade distribution -->
         <div class="card card--grade">
           <div class="card__head">
-            <h2><i class="fa-solid fa-chart-pie"></i> การกระจายเกรด</h2>
-            <div class="muted small">
-              4: 80–100 • 3.5: 75–79 • 3: 70–74 • ปรับปรุง: &lt;70
-            </div>
+            <h2>
+              <i class="fa-solid fa-chart-pie"></i> การกระจายเกรด (ห้องที่เลือก)
+            </h2>
+            <div class="muted small">แสดงเปอร์เซ็นต์บนชิ้นพาย</div>
           </div>
           <div class="chart-wrap">
-            <canvas id="gradeChart" aria-label="Grade distribution"></canvas>
+            <canvas id="gradeChart"></canvas>
           </div>
         </div>
 
-        <!-- Student stacked bars -->
         <div class="card card--span2">
           <div class="card__head">
-            <h2><i class="fa-solid fa-bars-staggered"></i> คะแนนรายบุคคล</h2>
+            <h2>
+              <i class="fa-solid fa-bars-staggered"></i> คะแนนรายบุคคล
+              (แท่งแนวนอนแบ่ง 3 ส่วน)
+            </h2>
+            <div class="muted small">
+              แต่ละส่วนแสดงคะแนน • ซ้าย: เลขที่+ชื่อ • ขวา: คะแนนรวม+เกรด
+            </div>
           </div>
 
           <div class="legend">
@@ -169,11 +297,20 @@
       </section>
 
       <footer class="footer">
-        <div class="footer__left">AI & Data Science KurNok| © 2026</div>
+        <div class="footer__left">
+          <i class="fa-solid fa-cloud-arrow-down"></i>
+          ดึงข้อมูลจาก Google Sheet (sheet: <b>score</b>)
+        </div>
         <div class="footer__right muted small" id="lastUpdated">-</div>
       </footer>
     </main>
 
-    <script src="app.js"></script>
+    <!-- ✅ เรียก kill อีกครั้งก่อนโหลด app.js เพื่อความชัวร์ -->
+    <script>
+      if (window.__killDataLabels) window.__killDataLabels();
+    </script>
+
+    <!-- ✅ Cache-busting: เปลี่ยนเลขท้ายทุกครั้งที่แก้โค้ด -->
+    <script src="app.js?v=6"></script>
   </body>
 </html>
